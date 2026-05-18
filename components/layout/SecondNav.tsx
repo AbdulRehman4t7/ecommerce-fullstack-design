@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import { IMAGES } from "@/lib/assets";
 
 const links = [
   "All offers",
@@ -23,8 +25,17 @@ export default function SecondNav() {
             </Link>
           ))}
         </div>
-        <span className="text-xs text-grey-text">
-          English, USD <span className="ml-1">🇺🇸</span>
+        <span className="flex items-center gap-1.5 text-xs text-grey-text">
+          English, USD
+          <span className="relative inline-block h-3.5 w-5">
+            <Image
+              src={IMAGES.flags["United States"]}
+              alt="US"
+              fill
+              className="object-contain"
+              sizes="20px"
+            />
+          </span>
         </span>
       </div>
     </nav>

@@ -1,10 +1,12 @@
+import Image from "next/image";
+import { IMAGES } from "@/lib/assets";
+
 export default function TopBar() {
   const items = [
     "Save big on top brands",
     "Get the app",
     "Help",
     "English/USD",
-    "🇩🇪",
   ];
 
   return (
@@ -21,6 +23,16 @@ export default function TopBar() {
             </button>
           </span>
         ))}
+        <span className="mx-2 text-border">|</span>
+        <span className="relative ml-0 inline-block h-3.5 w-5">
+          <Image
+            src={IMAGES.flags.Germany}
+            alt="Germany"
+            fill
+            className="object-contain"
+            sizes="20px"
+          />
+        </span>
       </div>
     </div>
   );

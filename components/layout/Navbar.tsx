@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { IMAGES } from "@/lib/assets";
 import {
   Bell,
   ChevronDown,
@@ -32,11 +34,15 @@ export default function Navbar() {
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
-          <Link
-            href="/"
-            className="shrink-0 text-xl font-bold text-primary"
-          >
-            Brand
+          <Link href="/" className="relative flex shrink-0 items-center">
+            <Image
+              src={IMAGES.logo}
+              alt="Brand"
+              width={120}
+              height={32}
+              className="h-8 w-auto object-contain"
+              priority
+            />
           </Link>
 
           <button

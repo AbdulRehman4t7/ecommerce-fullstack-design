@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { supplierCountries } from "@/data/mockData";
 
 export default function SuppliersByRegion() {
@@ -13,7 +14,19 @@ export default function SuppliersByRegion() {
             type="button"
             className="flex flex-col items-center rounded border border-border p-3 text-center hover:border-primary hover:bg-page-bg"
           >
-            <span className="text-2xl">{country.flag}</span>
+            {country.flagImage ? (
+              <div className="relative h-8 w-10">
+                <Image
+                  src={country.flagImage}
+                  alt={country.name}
+                  fill
+                  className="object-contain"
+                  sizes="40px"
+                />
+              </div>
+            ) : (
+              <span className="text-2xl">{country.flag}</span>
+            )}
             <span className="mt-1 text-xs text-dark-text">{country.name}</span>
           </button>
         ))}

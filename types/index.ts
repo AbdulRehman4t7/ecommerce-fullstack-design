@@ -33,6 +33,7 @@ export interface Category {
 export interface SupplierCountry {
   name: string;
   flag: string;
+  flagImage?: string;
 }
 
 export interface CartItem {

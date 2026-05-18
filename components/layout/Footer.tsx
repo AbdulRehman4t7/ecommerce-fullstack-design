@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Globe, Mail, Share2, Rss } from "lucide-react";
 import { footerLinks } from "@/data/mockData";
+import { IMAGES } from "@/lib/assets";
 
 export default function Footer() {
   const columns = [
@@ -15,8 +17,14 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
-            <Link href="/" className="text-xl font-bold text-primary">
-              Brand
+            <Link href="/" className="inline-block">
+              <Image
+                src={IMAGES.logo}
+                alt="Brand"
+                width={120}
+                height={32}
+                className="h-8 w-auto object-contain"
+              />
             </Link>
             <p className="mt-3 text-sm text-grey-text">
               Global B2B marketplace connecting buyers with verified suppliers
@@ -57,11 +65,23 @@ export default function Footer() {
           <div>
             <h4 className="mb-3 text-sm font-semibold text-dark-text">App</h4>
             <div className="space-y-2">
-              <div className="rounded border border-border bg-page-bg px-3 py-2 text-xs font-medium">
-                App Store
+              <div className="relative h-10 w-full">
+                <Image
+                  src={IMAGES.appStore}
+                  alt="Download on the App Store"
+                  fill
+                  className="object-contain object-left"
+                  sizes="140px"
+                />
               </div>
-              <div className="rounded border border-border bg-page-bg px-3 py-2 text-xs font-medium">
-                Google Play
+              <div className="relative h-10 w-full">
+                <Image
+                  src={IMAGES.googlePlay}
+                  alt="Get it on Google Play"
+                  fill
+                  className="object-contain object-left"
+                  sizes="140px"
+                />
               </div>
             </div>
           </div>
