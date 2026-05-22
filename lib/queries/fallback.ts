@@ -1,10 +1,8 @@
-import { applyProductImages, products, categories } from "@/data/mockData";
+import { products, categories } from "@/data/mockData";
 import { calcDiscount } from "@/lib/mappers/product";
 import type { Category, DealProduct, Product } from "@/types";
 import type { ProductsListResponse } from "@/types/api";
 import type { ProductQueryParams } from "./products";
-
-applyProductImages(products);
 
 function toProduct(p: (typeof products)[0]): Product {
   return {

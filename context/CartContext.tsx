@@ -79,14 +79,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addToCart = useCallback((product: Product, quantity = 1) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
-      if (existing) {
-        return prev.map((i) =>
-          i.product.id === product.id
-            ? { ...i, quantity: i.quantity + quantity }
-            : i
-        );
-      }
-      return [...prev, { product, quantity, selected: true }];
+      const next = existing
+        ? prev.map((i) =>
+            i.product.id === product.id
+              ? { ...i, quantity: i.quantity + quantity }
+              : i
+          )
+        : [...prev, { product, quantity, selected: true }];
+
+      const newQty = existing ? existing.quantity + quantity : quantity;
+      fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product_id: product.id, quantity: newQty }),
+      }).catch(() => {});
+
+      return next;
     });
   }, []);
 

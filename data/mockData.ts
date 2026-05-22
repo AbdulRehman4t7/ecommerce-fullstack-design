@@ -1,11 +1,17 @@
-import type { Product, Category, SupplierCountry, Review } from "@/types";
+import type { Product, SupplierCountry, Review } from "@/types";
+
+export interface SidebarCategory {
+  name: string;
+  icon: string;
+  subcategories: string[];
+}
 
 /** Legacy mock rows use numeric ids before API mapping */
 type ProductRecord = Omit<Product, "id"> & { id: number };
 import { IMAGES } from "@/lib/assets";
 import { applyProductImages } from "@/lib/productImages";
 
-export const categories: Category[] = [
+export const categories: SidebarCategory[] = [
   { name: "Automobiles", icon: "🚗", subcategories: ["Car Parts", "Motorcycles", "Car Electronics"] },
   { name: "Clothes", icon: "👔", subcategories: ["Men", "Women", "Kids"] },
   { name: "Electronics", icon: "💻", subcategories: ["Phones", "Laptops", "Cameras", "Audio"] },
@@ -29,17 +35,7 @@ export const supplierCountries: SupplierCountry[] = [
   { name: "India", flag: "🇮🇳" },
 ];
 
-export const brands = ["Samsung", "Apple", "Huawei", "Pocco", "Lenovo"];
-export const features = ["Metallic", "Plastic cover", "8GB Ram", "Super Slim", "Large Memory"];
-export const listingCategories = [
-  "Mobile accessories",
-  "Smartwatches",
-  "Laptops",
-  "Cameras",
-  "Headphones",
-  "Smartphones",
-  "Computer & Office",
-];
+export { brands, features, listingCategories } from "@/lib/constants/filters";
 
 export const products: ProductRecord[] = [
   // Mobile phones / accessories (8)
@@ -683,7 +679,9 @@ export function getProductById(id: string | number): ProductRecord | undefined {
   );
 }
 
-export function getProductsBySubcategory(subcategory: string): Product[] {
+export function getProductsBySubcategory(
+  subcategory: string
+): ProductRecord[] {
   return products.filter(
     (p) => p.subcategory.toLowerCase() === subcategory.toLowerCase()
   );

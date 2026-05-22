@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Star } from "lucide-react";
-import { brands, features } from "@/data/mockData";
+import { brands, features } from "@/lib/constants/filters";
 import type { Category } from "@/types";
 
 interface FilterSidebarProps {

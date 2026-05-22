@@ -65,24 +65,20 @@ export default function Footer() {
           <div>
             <h4 className="mb-3 text-sm font-semibold text-dark-text">App</h4>
             <div className="space-y-2">
-              <div className="relative h-10 w-full">
-                <Image
-                  src={IMAGES.appStore}
-                  alt="Download on the App Store"
-                  fill
-                  className="object-contain object-left"
-                  sizes="140px"
-                />
-              </div>
-              <div className="relative h-10 w-full">
-                <Image
-                  src={IMAGES.googlePlay}
-                  alt="Get it on Google Play"
-                  fill
-                  className="object-contain object-left"
-                  sizes="140px"
-                />
-              </div>
+              <Image
+                src={IMAGES.appStore}
+                alt="Download on the App Store"
+                width={140}
+                height={40}
+                className="h-10 w-auto object-contain object-left"
+              />
+              <Image
+                src={IMAGES.googlePlay}
+                alt="Get it on Google Play"
+                width={140}
+                height={40}
+                className="h-10 w-auto object-contain object-left"
+              />
             </div>
           </div>
         </div>

@@ -18,7 +18,7 @@ export interface ProductQueryParams {
   maxPrice?: number;
   page?: number;
   limit?: number;
-  badge?: string;
+  badge?: "Hot" | "New" | "Sale" | "Verified";
 }
 
 const PRODUCT_SELECT = `
@@ -140,12 +140,17 @@ export async function queryProductByIdOrSlug(
 
   const product = mapProductRow(row as ProductRowWithCategory);
 
-  const relatedQuery = supabase
+  const categoryId = (row as ProductRowWithCategory).category_id;
+
+  let relatedQuery = supabase
     .from("products")
     .select(PRODUCT_SELECT)
-    .eq("category_id", (row as ProductRowWithCategory).category_id ?? "")
     .neq("id", product.id)
     .limit(4);
+
+  if (categoryId) {
+    relatedQuery = relatedQuery.eq("category_id", categoryId);
+  }
 
   const { data: relatedRows } = await relatedQuery;
 

@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { mapProductRow } from "@/lib/mappers/product";
-import type { ProductRowWithCategory } from "@/types/database";
+import type {
+  Database,
+  ProductRowWithCategory,
+} from "@/types/database";
+
+export const dynamic = "force-dynamic";
+
+type CartItemInsert = Database["public"]["Tables"]["cart_items"]["Insert"];
 
 const SESSION_COOKIE = "cart_session_id";
 
@@ -25,20 +32,20 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
     const { data, error } = await supabase
       .from("cart_items")
-      .select(
-        `quantity, products ( ${"*"}, categories ( name, slug ) )`
-      )
+      .select("quantity, products(*, categories(name, slug))")
       .eq("session_id", sessionId);
 
     if (error) throw error;
 
-    const items = (data ?? []).map((row) => {
-      const product = row.products as unknown as ProductRowWithCategory;
-      return {
-        quantity: row.quantity,
-        product: mapProductRow(product),
-      };
-    });
+    type CartRow = {
+      quantity: number;
+      products: ProductRowWithCategory;
+    };
+
+    const items = ((data ?? []) as CartRow[]).map((row) => ({
+      quantity: row.quantity,
+      product: mapProductRow(row.products),
+    }));
 
     return NextResponse.json({ data: items });
   } catch (err) {
@@ -68,14 +75,15 @@ export async function POST(request: NextRequest) {
     const sessionId = getSessionId(request);
     const supabase = createServiceClient();
 
-    const { error } = await supabase.from("cart_items").upsert(
-      {
-        session_id: sessionId,
-        product_id: body.product_id,
-        quantity: body.quantity ?? 1,
-      },
-      { onConflict: "session_id,product_id" }
-    );
+    const payload: CartItemInsert = {
+      session_id: sessionId,
+      product_id: body.product_id,
+      quantity: body.quantity ?? 1,
+    };
+
+    const { error } = await supabase
+      .from("cart_items")
+      .upsert([payload], { onConflict: "session_id,product_id" });
 
     if (error) throw error;
 

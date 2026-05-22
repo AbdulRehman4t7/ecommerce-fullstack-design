@@ -15,16 +15,29 @@ import type { DealProduct } from "@/types";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [categoriesRes, recommendedRes, dealsRes] = await Promise.all([
+  const [
+    categoriesRes,
+    recommendedRes,
+    dealsRes,
+    featuredRes,
+    homeGardenRes,
+    electronicsRes,
+  ] = await Promise.all([
     fetchCategories(),
     fetchProducts({ limit: "10", sort: "newest" }),
     fetchProducts({ badge: "Sale", limit: "5" }),
+    fetchProducts({ featured: "true", limit: "10" }),
+    fetchProducts({ category: "home-garden", limit: "3" }),
+    fetchProducts({ category: "electronics", limit: "3" }),
   ]);
 
   const dealProducts: DealProduct[] = dealsRes.data.map((p) => ({
     ...p,
     discount: calcDiscount(p) ?? 20,
   }));
+
+  const recommended =
+    featuredRes.data.length > 0 ? featuredRes.data : recommendedRes.data;
 
   return (
     <PageShell>
@@ -34,9 +47,12 @@ export default async function HomePage() {
           <div className="min-w-0 flex-1">
             <HeroBanner />
             <DealsSection products={dealProducts} />
-            <CategoryGrid />
+            <CategoryGrid
+              homeProducts={homeGardenRes.data}
+              electronicsProducts={electronicsRes.data}
+            />
             <RequestToSupplier />
-            <RecommendedItems products={recommendedRes.data} />
+            <RecommendedItems products={recommended} />
             <ExtraServices />
             <SuppliersByRegion />
           </div>

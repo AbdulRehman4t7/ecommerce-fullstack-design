@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 import {
   createProduct,
   queryProducts,
   type ProductQueryParams,
 } from "@/lib/queries/products";
 import type { ProductInsert } from "@/types/database";
+
+const BADGES = ["Hot", "New", "Sale", "Verified"] as const;
 
 function parseSearchParams(
   searchParams: URLSearchParams
@@ -13,6 +17,10 @@ function parseSearchParams(
   const limit = parseInt(searchParams.get("limit") ?? "12", 10);
   const minPrice = searchParams.get("min_price");
   const maxPrice = searchParams.get("max_price");
+  const badgeParam = searchParams.get("badge");
+  const badge = BADGES.includes(badgeParam as (typeof BADGES)[number])
+    ? (badgeParam as ProductQueryParams["badge"])
+    : undefined;
 
   return {
     category: searchParams.get("category") ?? undefined,
@@ -20,7 +28,7 @@ function parseSearchParams(
     featured: searchParams.get("featured") === "true",
     sort:
       (searchParams.get("sort") as ProductQueryParams["sort"]) ?? undefined,
-    badge: searchParams.get("badge") ?? undefined,
+    badge,
     page: Number.isNaN(page) ? 1 : page,
     limit: Number.isNaN(limit) ? 12 : limit,
     minPrice: minPrice ? parseFloat(minPrice) : undefined,

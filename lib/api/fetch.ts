@@ -2,6 +2,14 @@ import { apiUrl } from "./url";
 import type { Category, Product } from "@/types";
 import type { ProductsListResponse } from "@/types/api";
 
+async function parseJson<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `Request failed (${res.status})`);
+  }
+  return res.json() as Promise<T>;
+}
+
 export async function fetchProducts(
   searchParams: Record<string, string | undefined> = {}
 ): Promise<ProductsListResponse> {
@@ -13,10 +21,7 @@ export async function fetchProducts(
   const res = await fetch(apiUrl(`/api/products${qs ? `?${qs}` : ""}`), {
     cache: "no-store",
   });
-  if (!res.ok) {
-    throw new Error("Failed to fetch products");
-  }
-  return res.json() as Promise<ProductsListResponse>;
+  return parseJson<ProductsListResponse>(res);
 }
 
 export async function fetchProduct(
@@ -26,16 +31,10 @@ export async function fetchProduct(
   if (res.status === 404) {
     throw new Error("Product not found");
   }
-  if (!res.ok) {
-    throw new Error("Failed to fetch product");
-  }
-  return res.json() as Promise<{ data: Product; relatedProducts: Product[] }>;
+  return parseJson<{ data: Product; relatedProducts: Product[] }>(res);
 }
 
 export async function fetchCategories(): Promise<{ data: Category[] }> {
   const res = await fetch(apiUrl("/api/categories"), { cache: "no-store" });
-  if (!res.ok) {
-    throw new Error("Failed to fetch categories");
-  }
-  return res.json() as Promise<{ data: Category[] }>;
+  return parseJson<{ data: Category[] }>(res);
 }
