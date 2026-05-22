@@ -10,9 +10,11 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, compact = true }: ProductCardProps) {
+  const href = `/products/${product.slug ?? product.id}`;
+
   return (
     <Link
-      href={`/products/${product.id}`}
+      href={href}
       className="group block rounded border border-border bg-white p-2 transition-shadow hover:shadow-md"
     >
       <div className="relative mx-auto aspect-square w-full max-w-[120px] overflow-hidden bg-page-bg">

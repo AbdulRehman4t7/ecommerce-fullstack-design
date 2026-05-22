@@ -3,9 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { dealProducts } from "@/data/mockData";
+import type { DealProduct } from "@/types";
+import { calcDiscount } from "@/lib/mappers/product";
 
-export default function DealsSection() {
+interface DealsSectionProps {
+  products: DealProduct[];
+}
+
+export default function DealsSection({ products }: DealsSectionProps) {
   const [time, setTime] = useState({ h: 3, m: 27, s: 31 });
 
   useEffect(() => {
@@ -53,32 +58,36 @@ export default function DealsSection() {
         </div>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
-        {dealProducts.map((product) => (
-          <Link
-            key={product.id}
-            href={`/products/${product.id}`}
-            className="flex w-[140px] shrink-0 flex-col rounded border border-border p-2 hover:shadow-sm"
-          >
-            <div className="relative h-20 w-20">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="rounded object-cover"
-                sizes="80px"
-              />
-            </div>
-            <span className="mt-1 inline-block w-fit rounded bg-red-500 px-1 text-[10px] font-bold text-white">
-              -{product.discount}%
-            </span>
-            <p className="mt-1 line-clamp-2 text-xs text-dark-text">
-              {product.name}
-            </p>
-            <p className="mt-1 text-sm font-bold text-success">
-              ${product.price.toFixed(2)}
-            </p>
-          </Link>
-        ))}
+        {products.map((product) => {
+          const discount =
+            product.discount ?? calcDiscount(product) ?? 15;
+          return (
+            <Link
+              key={product.id}
+              href={`/products/${product.slug ?? product.id}`}
+              className="flex w-[140px] shrink-0 flex-col rounded border border-border p-2 hover:shadow-sm"
+            >
+              <div className="relative h-20 w-20">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  className="rounded object-cover"
+                  sizes="80px"
+                />
+              </div>
+              <span className="mt-1 inline-block w-fit rounded bg-red-500 px-1 text-[10px] font-bold text-white">
+                -{discount}%
+              </span>
+              <p className="mt-1 line-clamp-2 text-xs text-dark-text">
+                {product.name}
+              </p>
+              <p className="mt-1 text-sm font-bold text-success">
+                ${product.price.toFixed(2)}
+              </p>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

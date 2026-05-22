@@ -1,5 +1,6 @@
 export interface Product {
-  id: number;
+  id: string;
+  slug?: string;
   name: string;
   price: number;
   originalPrice?: number;
@@ -9,6 +10,7 @@ export interface Product {
   images: string[];
   description: string;
   category: string;
+  categorySlug?: string;
   subcategory: string;
   rating: number;
   reviews: number;
@@ -22,12 +24,16 @@ export interface Product {
   stock: number;
   specs: { key: string; value: string }[];
   tags: string[];
+  isFeatured?: boolean;
 }
 
 export interface Category {
+  id: string;
   name: string;
+  slug: string;
   icon: string;
   subcategories: string[];
+  productCount?: number;
 }
 
 export interface SupplierCountry {
@@ -50,4 +56,8 @@ export interface Review {
   rating: number;
   date: string;
   comment: string;
+}
+
+export interface DealProduct extends Product {
+  discount?: number;
 }

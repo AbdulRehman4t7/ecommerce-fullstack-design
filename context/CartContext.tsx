@@ -9,28 +9,17 @@ import {
   useState,
 } from "react";
 import type { Product, CartItem } from "@/types";
-import { getProductById } from "@/data/mockData";
-
-const DEFAULT_CART_IDS = [22, 23, 24];
-
-function getDefaultCart(): CartItem[] {
-  return DEFAULT_CART_IDS.map((id) => {
-    const product = getProductById(id);
-    if (!product) return null;
-    return { product, quantity: 1, selected: true };
-  }).filter((item): item is CartItem => item !== null);
-}
 
 interface CartContextValue {
   items: CartItem[];
   itemCount: number;
   addToCart: (product: Product, quantity?: number) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
-  toggleSelect: (productId: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  toggleSelect: (productId: string) => void;
   toggleSelectAll: () => void;
   removeSelected: () => void;
-  isInCart: (productId: number) => boolean;
+  isInCart: (productId: string) => boolean;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -53,12 +42,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw === null) {
-      setItems(getDefaultCart());
-    } else {
+    if (raw !== null) {
       setItems(loadCart());
+      setHydrated(true);
+      return;
     }
-    setHydrated(true);
+
+    fetch("/api/products?limit=3")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json: { data?: Product[] } | null) => {
+        if (json?.data?.length) {
+          setItems(
+            json.data.slice(0, 3).map((product) => ({
+              product,
+              quantity: 1,
+              selected: true,
+            }))
+          );
+        }
+      })
+      .catch(() => setItems([]))
+      .finally(() => setHydrated(true));
   }, []);
 
   useEffect(() => {
@@ -86,11 +90,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const removeFromCart = useCallback((productId: number) => {
+  const removeFromCart = useCallback((productId: string) => {
     setItems((prev) => prev.filter((i) => i.product.id !== productId));
   }, []);
 
-  const updateQuantity = useCallback((productId: number, quantity: number) => {
+  const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity < 1) return;
     setItems((prev) =>
       prev.map((i) =>
@@ -99,7 +103,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const toggleSelect = useCallback((productId: number) => {
+  const toggleSelect = useCallback((productId: string) => {
     setItems((prev) =>
       prev.map((i) =>
         i.product.id === productId ? { ...i, selected: !i.selected } : i
@@ -119,7 +123,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const isInCart = useCallback(
-    (productId: number) => items.some((i) => i.product.id === productId),
+    (productId: string) => items.some((i) => i.product.id === productId),
     [items]
   );
 

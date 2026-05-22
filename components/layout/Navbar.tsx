@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { IMAGES } from "@/lib/assets";
 import {
   Bell,
@@ -15,11 +16,23 @@ import {
   X,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import SearchDropdown from "@/components/products/SearchDropdown";
 
 export default function Navbar() {
   const { itemCount } = useCart();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const submitSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setMobileOpen(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white">
@@ -52,21 +65,35 @@ export default function Navbar() {
             All category <ChevronDown size={14} />
           </button>
 
-          <div className="hidden flex-1 items-center md:flex">
+          <div
+            ref={searchRef}
+            className="relative hidden flex-1 items-center md:flex"
+          >
             <input
               type="search"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSearchOpen(true);
+              }}
+              onFocus={() => setSearchOpen(true)}
+              onKeyDown={(e) => e.key === "Enter" && submitSearch()}
               placeholder="Search products, suppliers..."
               className="h-9 flex-1 rounded-l border border-r-0 border-border px-3 text-sm outline-none focus:border-primary"
             />
             <button
               type="button"
+              onClick={submitSearch}
               className="flex h-9 items-center gap-1 rounded-r bg-primary px-4 text-sm text-white hover:bg-primary/90"
             >
               <Search size={16} />
               Search
             </button>
+            <SearchDropdown
+              query={searchQuery}
+              open={searchOpen}
+              onClose={() => setSearchOpen(false)}
+            />
           </div>
 
           <div className="ml-auto flex items-center gap-3 sm:gap-4">
@@ -103,19 +130,32 @@ export default function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-border px-4 py-3 md:hidden">
+        <div className="relative border-t border-border px-4 py-3 md:hidden">
           <div className="flex gap-2">
             <input
               type="search"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSearchOpen(true);
+              }}
+              onKeyDown={(e) => e.key === "Enter" && submitSearch()}
               placeholder="Search..."
               className="h-9 flex-1 rounded border border-border px-3 text-sm"
             />
-            <button type="button" className="rounded bg-primary px-3 text-white">
+            <button
+              type="button"
+              onClick={submitSearch}
+              className="rounded bg-primary px-3 text-white"
+            >
               <Search size={18} />
             </button>
           </div>
+          <SearchDropdown
+            query={searchQuery}
+            open={searchOpen && searchQuery.length > 0}
+            onClose={() => setSearchOpen(false)}
+          />
         </div>
       )}
     </header>

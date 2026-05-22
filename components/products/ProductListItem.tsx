@@ -16,7 +16,7 @@ export default function ProductListItem({ product }: ProductListItemProps) {
     <article className="flex gap-4 border-b border-border bg-white p-4 last:border-b-0">
       <input type="checkbox" className="mt-2 shrink-0" aria-label="Select product" />
       <Link
-        href={`/products/${product.id}`}
+        href={`/products/${product.slug ?? product.id}`}
         className="relative h-40 w-40 shrink-0 overflow-hidden rounded border border-border bg-page-bg"
       >
         <Image
@@ -29,7 +29,7 @@ export default function ProductListItem({ product }: ProductListItemProps) {
       </Link>
       <div className="min-w-0 flex-1">
         <Link
-          href={`/products/${product.id}`}
+          href={`/products/${product.slug ?? product.id}`}
           className="text-[15px] font-bold text-primary hover:underline"
         >
           {product.name}
@@ -46,7 +46,7 @@ export default function ProductListItem({ product }: ProductListItemProps) {
           {product.description}
         </p>
         <Link
-          href={`/products/${product.id}`}
+          href={`/products/${product.slug ?? product.id}`}
           className="mt-1 inline-block text-sm text-primary hover:underline"
         >
           View details

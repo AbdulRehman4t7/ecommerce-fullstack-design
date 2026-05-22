@@ -1,28 +1,26 @@
 import { notFound } from "next/navigation";
 import PageShell from "@/components/layout/PageShell";
 import ProductDetail from "@/components/products/ProductDetail";
-import { getProductById } from "@/data/mockData";
+import { fetchProduct } from "@/lib/api/fetch";
+
+export const dynamic = "force-dynamic";
 
 interface ProductPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export function generateStaticParams() {
-  return Array.from({ length: 24 }, (_, i) => ({
-    id: String(i + 1),
-  }));
-}
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { id } = await params;
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const product = getProductById(Number(params.id));
+  try {
+    const { data: product, relatedProducts } = await fetchProduct(id);
 
-  if (!product) {
+    return (
+      <PageShell>
+        <ProductDetail product={product} relatedProducts={relatedProducts} />
+      </PageShell>
+    );
+  } catch {
     notFound();
   }
-
-  return (
-    <PageShell>
-      <ProductDetail product={product} />
-    </PageShell>
-  );
 }

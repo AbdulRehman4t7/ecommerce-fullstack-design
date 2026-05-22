@@ -1,5 +1,9 @@
 import type { Product, Category, SupplierCountry, Review } from "@/types";
-import { IMAGES, gallery, techImage, clothImage } from "@/lib/assets";
+
+/** Legacy mock rows use numeric ids before API mapping */
+type ProductRecord = Omit<Product, "id"> & { id: number };
+import { IMAGES } from "@/lib/assets";
+import { applyProductImages } from "@/lib/productImages";
 
 export const categories: Category[] = [
   { name: "Automobiles", icon: "🚗", subcategories: ["Car Parts", "Motorcycles", "Car Electronics"] },
@@ -37,7 +41,7 @@ export const listingCategories = [
   "Computer & Office",
 ];
 
-export const products: Product[] = [
+export const products: ProductRecord[] = [
   // Mobile phones / accessories (8)
   {
     id: 1,
@@ -114,14 +118,14 @@ export const products: Product[] = [
   },
   {
     id: 4,
-    name: "Wireless Bluetooth Earbuds TWS Pro 5.3",
+    name: "Wired Gaming Headset 7.1 Surround with Noise-Cancelling Mic",
     price: 8.50,
     originalPrice: 15.00,
     minOrder: 20,
-    unit: "pair",
+    unit: "piece",
     image: "",
     images: [],
-    description: "Active noise cancelling TWS earbuds with 30hr battery life and IPX5 water resistance.",
+    description: "Professional gaming headset with over-ear cushions, adjustable boom microphone, and blue LED accents for PC and console.",
     category: "Electronics",
     subcategory: "Mobile accessories",
     rating: 4.7,
@@ -235,14 +239,14 @@ export const products: Product[] = [
   // Cameras (4)
   {
     id: 9,
-    name: "GoPro HERO6 4K Action Camera - Black",
+    name: "Canon EOS 2000D DSLR Camera with 18-55mm Lens",
     price: 998.0,
     originalPrice: 1299.0,
     minOrder: 1,
     unit: "piece",
     image: "",
     images: [],
-    description: "Capture stunning 4K video with advanced stabilization. Waterproof to 10m without housing.",
+    description: "24.1MP Canon DSLR with EF-S 18-55mm IS II lens, Full HD video, and easy Wi-Fi connectivity for beginners and enthusiasts.",
     category: "Electronics",
     subcategory: "Cameras",
     rating: 4.6,
@@ -456,13 +460,13 @@ export const products: Product[] = [
   },
   {
     id: 18,
-    name: "Studio Monitor Speakers Pair 5 Inch Active",
+    name: "RGB Gaming Headset with Detachable Microphone",
     price: 145.00,
     minOrder: 1,
-    unit: "pair",
+    unit: "piece",
     image: "",
     images: [],
-    description: "Professional studio monitors with flat frequency response for accurate mixing.",
+    description: "Over-ear gaming headset with noise-cancelling mic, breathable ear cushions, and immersive 7.1 virtual surround sound.",
     category: "Electronics",
     subcategory: "Audio",
     rating: 4.8,
@@ -505,13 +509,13 @@ export const products: Product[] = [
   },
   {
     id: 20,
-    name: "Portable Bluetooth Speaker IPX7 Waterproof 360°",
+    name: "Premium Wireless Over-Ear Headphones with Gold Trim",
     price: 15.80,
     minOrder: 20,
     unit: "piece",
     image: "",
     images: [],
-    description: "360° sound portable speaker with 20W output and 12 hour playtime.",
+    description: "Stylish white over-ear Bluetooth headphones with plush grey cushions, gold accent ring, and long battery life.",
     category: "Electronics",
     subcategory: "Audio",
     rating: 4.5,
@@ -529,14 +533,14 @@ export const products: Product[] = [
   // Clothing (4)
   {
     id: 21,
-    name: "Mens Long Sleeve T-shirt Cotton Base Layer Slim Fitness",
+    name: "Mens Heathered Polo Shirt Cotton Short Sleeve",
     price: 98.50,
     originalPrice: 100.0,
     minOrder: 1,
     unit: "piece",
     image: "",
     images: [],
-    description: "Premium cotton base layer t-shirt for fitness and everyday wear. Moisture wicking fabric.",
+    description: "Classic slim-fit polo in heathered teal knit with ribbed collar, three-button placket, and breathable cotton blend fabric.",
     category: "Clothes",
     subcategory: "Men",
     rating: 4.6,
@@ -554,13 +558,13 @@ export const products: Product[] = [
   },
   {
     id: 22,
-    name: "T-shirts with multiple colors, for men and lady",
+    name: "Mens Denim Shorts Classic Fit Blue Wash",
     price: 19.0,
     minOrder: 1,
     unit: "piece",
     image: "",
     images: [],
-    description: "Comfortable cotton blend t-shirts available in multiple colors and sizes for men and women.",
+    description: "Medium-wash denim shorts with 5-pocket styling, belt loops, and contrast stitching. Casual summer essential for men.",
     category: "Clothes",
     subcategory: "Men",
     rating: 4.4,
@@ -573,18 +577,18 @@ export const products: Product[] = [
     inStock: true,
     stock: 500,
     specs: [{ key: "Material", value: "Cotton Blend" }],
-    tags: ["t-shirt", "unisex"],
+    tags: ["denim", "shorts", "mens"],
   },
   {
     id: 23,
-    name: "Women Summer Floral Dress Casual Midi",
+    name: "Women Blue Formal Blazer Jacket Two-Button",
     price: 24.50,
     originalPrice: 35.00,
     minOrder: 5,
     unit: "piece",
     image: "",
     images: [],
-    description: "Lightweight floral midi dress perfect for summer occasions. Available in S-XL.",
+    description: "Tailored royal blue blazer with notch lapels, two-button closure, and welt pockets. Pairs with dress shirts for office or events.",
     category: "Clothes",
     subcategory: "Women",
     rating: 4.5,
@@ -598,17 +602,17 @@ export const products: Product[] = [
     inStock: true,
     stock: 1200,
     specs: [{ key: "Length", value: "Midi" }, { key: "Season", value: "Summer" }],
-    tags: ["dress", "women", "floral"],
+    tags: ["blazer", "women", "formal"],
   },
   {
     id: 24,
-    name: "Kids Hooded Sweatshirt Cotton Fleece Winter",
+    name: "Kids Winter Parka Jacket with Faux-Fur Hood",
     price: 12.50,
     minOrder: 10,
     unit: "piece",
     image: "",
     images: [],
-    description: "Warm fleece hooded sweatshirt for kids ages 4-12. Soft cotton interior lining.",
+    description: "Warm tan parka for kids with faux-fur trimmed hood, multiple flap pockets, and ribbed cuffs for cold weather.",
     category: "Clothes",
     subcategory: "Kids",
     rating: 4.7,
@@ -621,23 +625,11 @@ export const products: Product[] = [
     inStock: true,
     stock: 800,
     specs: [{ key: "Material", value: "Cotton Fleece" }, { key: "Ages", value: "4-12" }],
-    tags: ["hoodie", "kids", "winter"],
+    tags: ["parka", "kids", "winter"],
   },
 ];
 
-let techCounter = 0;
-let clothCounter = 0;
-products.forEach((product) => {
-  if (product.category === "Clothes") {
-    const i = clothCounter++;
-    product.image = clothImage(i);
-    product.images = gallery(IMAGES.cloth, i);
-  } else {
-    const i = techCounter++;
-    product.image = techImage(i);
-    product.images = gallery(IMAGES.tech, i);
-  }
-});
+applyProductImages(products);
 
 export const dealProducts = products.slice(0, 5).map((p, i) => ({
   ...p,
@@ -685,8 +677,10 @@ export const footerLinks = {
   forUsers: ["Login", "Register", "My Orders", "Wishlist"],
 };
 
-export function getProductById(id: number): Product | undefined {
-  return products.find((p) => p.id === id);
+export function getProductById(id: string | number): ProductRecord | undefined {
+  return products.find(
+    (p) => String(p.id) === String(id)
+  );
 }
 
 export function getProductsBySubcategory(subcategory: string): Product[] {

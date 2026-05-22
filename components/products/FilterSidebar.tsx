@@ -1,44 +1,76 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Star } from "lucide-react";
-import {
-  brands,
-  features,
-  listingCategories,
-} from "@/data/mockData";
+import { brands, features } from "@/data/mockData";
+import type { Category } from "@/types";
 
 interface FilterSidebarProps {
+  categories: Category[];
   mobileOpen?: boolean;
   onClose?: () => void;
+  activeCategory?: string;
 }
 
 export default function FilterSidebar({
+  categories,
   mobileOpen = false,
   onClose,
+  activeCategory,
 }: FilterSidebarProps) {
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [minPrice, setMinPrice] = useState(
+    searchParams.get("min_price") ?? ""
+  );
+  const [maxPrice, setMaxPrice] = useState(
+    searchParams.get("max_price") ?? ""
+  );
   const [condition, setCondition] = useState("any");
+
+  const applyPrice = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (minPrice) params.set("min_price", minPrice);
+    else params.delete("min_price");
+    if (maxPrice) params.set("max_price", maxPrice);
+    else params.delete("max_price");
+    params.delete("page");
+    router.push(`/products?${params.toString()}`);
+    onClose?.();
+  };
 
   const content = (
     <aside className="w-full rounded border border-border bg-white p-4 lg:w-[200px]">
       <Section title="Category">
         <ul className="space-y-1">
-          {listingCategories.map((cat) => (
-            <li key={cat}>
-              <button
-                type="button"
-                className="w-full text-left text-sm text-dark-text hover:text-primary"
+          {categories.map((cat) => (
+            <li key={cat.id}>
+              <Link
+                href={`/products?category=${cat.slug}`}
+                onClick={onClose}
+                className={`block w-full text-left text-sm hover:text-primary ${
+                  activeCategory === cat.slug
+                    ? "font-semibold text-primary"
+                    : "text-dark-text"
+                }`}
               >
-                {cat}
-              </button>
+                {cat.name}
+                {cat.productCount !== undefined && (
+                  <span className="text-grey-text"> ({cat.productCount})</span>
+                )}
+              </Link>
             </li>
           ))}
         </ul>
-        <button type="button" className="mt-2 text-sm text-primary">
+        <Link
+          href="/products"
+          onClick={onClose}
+          className="mt-2 inline-block text-sm text-primary"
+        >
           See all
-        </button>
+        </Link>
       </Section>
 
       <Section title="Brands">
@@ -85,6 +117,7 @@ export default function FilterSidebar({
         </div>
         <button
           type="button"
+          onClick={applyPrice}
           className="mt-2 w-full rounded bg-primary py-1.5 text-sm text-white hover:bg-primary/90"
         >
           Apply

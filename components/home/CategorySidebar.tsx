@@ -2,16 +2,20 @@
 
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { categories } from "@/data/mockData";
+import type { Category } from "@/types";
 
-export default function CategorySidebar() {
+interface CategorySidebarProps {
+  categories: Category[];
+}
+
+export default function CategorySidebar({ categories }: CategorySidebarProps) {
   return (
     <aside className="hidden w-full shrink-0 rounded border border-border bg-white lg:block lg:w-[200px]">
       <ul className="py-1">
         {categories.map((cat) => (
-          <li key={cat.name}>
+          <li key={cat.id}>
             <Link
-              href="/products"
+              href={`/products?category=${cat.slug}`}
               className="flex items-center gap-2 px-3 py-2 text-sm text-dark-text hover:bg-page-bg hover:text-primary"
             >
               <span>{cat.icon}</span>

@@ -10,7 +10,7 @@ import ProductCard from "@/components/shared/ProductCard";
 import PromoBanner from "@/components/shared/PromoBanner";
 import Breadcrumb from "@/components/shared/Breadcrumb";
 import type { Product } from "@/types";
-import { productReviews, relatedProducts } from "@/data/mockData";
+import { productReviews } from "@/data/mockData";
 
 const colors = [
   { name: "Purple", class: "bg-purple-600" },
@@ -22,9 +22,13 @@ const sizes = ["XS", "S", "M", "L", "XL"];
 
 interface ProductDetailProps {
   product: Product;
+  relatedProducts: Product[];
 }
 
-export default function ProductDetail({ product }: ProductDetailProps) {
+export default function ProductDetail({
+  product,
+  relatedProducts,
+}: ProductDetailProps) {
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(colors[0].name);
@@ -45,7 +49,12 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       <Breadcrumb
         items={[
           { label: "Home", href: "/" },
-          { label: product.category, href: "/products" },
+          {
+            label: product.category,
+            href: product.categorySlug
+              ? `/products?category=${product.categorySlug}`
+              : "/products",
+          },
           { label: product.subcategory },
         ]}
       />
@@ -215,9 +224,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           </div>
 
           <div className="mt-4 space-y-2 rounded border border-border p-4 text-sm">
-            <p>
-              🚚 Shipping: $7.00 to United States via AliExpress
-            </p>
+            <p>🚚 Shipping: $7.00 to United States via AliExpress</p>
             <p>✅ Buyer Protection: Money back guarantee</p>
             <p className="text-grey-text">Returns: 15-day returns</p>
           </div>
@@ -246,17 +253,17 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           {activeTab === "description" && (
             <div>
               <p className="text-sm leading-relaxed text-grey-text">
-                {product.description} Lorem ipsum dolor sit amet, consectetur
-                adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris.
+                {product.description}
               </p>
-              <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-dark-text">
-                <li>Some cool feature one</li>
-                <li>Another important feature two</li>
-                <li>Premium quality material</li>
-                <li>Machine washable</li>
-              </ul>
+              {product.specs.length > 0 && (
+                <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-dark-text">
+                  {product.specs.map((spec) => (
+                    <li key={spec.key}>
+                      {spec.key}: {spec.value}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
           {activeTab === "reviews" && (

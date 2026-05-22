@@ -14,7 +14,7 @@ export default function ProductGridItem({ product }: ProductGridItemProps) {
   return (
     <article className="flex flex-col rounded border border-border bg-white overflow-hidden">
       <Link
-        href={`/products/${product.id}`}
+        href={`/products/${product.slug ?? product.id}`}
         className="relative h-[200px] w-full bg-page-bg"
       >
         <Image
@@ -27,7 +27,7 @@ export default function ProductGridItem({ product }: ProductGridItemProps) {
       </Link>
       <div className="flex flex-1 flex-col p-3">
         <Link
-          href={`/products/${product.id}`}
+          href={`/products/${product.slug ?? product.id}`}
           className="line-clamp-2 text-[13px] font-medium text-primary hover:underline"
         >
           {product.name}
