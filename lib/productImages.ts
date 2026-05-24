@@ -1,4 +1,4 @@
-import { asset } from "@/lib/assets";
+import { asset, IMAGES } from "@/lib/assets";
 
 /** Named asset paths matched to actual file contents */
 export const P = {
@@ -18,6 +18,56 @@ export const P = {
   wallet: asset("Layout", "alibaba", "Image", "cloth", "image 24.png"),
   backpack: asset("Layout", "alibaba", "Image", "cloth", "image 26.png"),
 };
+
+const [i0, i1, i2, i3, i4, i5, i6, i7] = IMAGES.interior;
+
+/** Supabase seed slugs → local /assets images (placehold.co returns SVG; Next Image rejects it) */
+export const PRODUCT_IMAGE_BY_SLUG: Record<string, { image: string; images: string[] }> = {
+  "samsung-galaxy-s24-ultra": { image: P.phoneRed, images: gal(P.phoneRed, P.phoneXiaomi, P.phoneRed) },
+  "iphone-15-pro-max": { image: P.phoneXiaomi, images: gal(P.phoneXiaomi, P.phoneRed, P.smartwatch) },
+  "macbook-pro-14-m3": { image: P.laptop, images: gal(P.laptop, P.tablet, P.laptop) },
+  "dell-xps-15": { image: P.laptop, images: gal(P.laptop, P.laptop, P.tablet) },
+  "canon-eos-r6": { image: P.camera, images: gal(P.camera, P.camera, P.tablet) },
+  "gopro-hero12": { image: P.camera, images: gal(P.camera, P.phoneRed) },
+  "sony-wh-1000xm5": { image: P.headphones, images: gal(P.headphones, P.headphonesAlt, P.headphones) },
+  "jbl-flip-6": { image: P.gamingHeadset, images: gal(P.gamingHeadset, P.headphones) },
+  "mens-cotton-tshirt-pack": { image: P.polo, images: gal(P.polo, P.denimShorts, P.polo) },
+  "womens-floral-dress": { image: P.denimShorts, images: gal(P.denimShorts, P.polo) },
+  "slim-fit-denim-jeans": { image: P.denimShorts, images: gal(P.denimShorts, P.polo) },
+  "leather-jacket-mens": { image: P.blazer, images: gal(P.blazer, P.parka, P.blazer) },
+  "running-sneakers-unisex": { image: P.backpack, images: gal(P.backpack, P.wallet) },
+  "canvas-tote-bag": { image: P.backpack, images: gal(P.backpack, P.wallet, P.backpack) },
+  "wool-winter-scarf": { image: P.wallet, images: gal(P.wallet, P.parka) },
+  "kids-hooded-sweatshirt": { image: P.parka, images: gal(P.parka, P.polo, P.parka) },
+  "modern-fabric-armchair": { image: i0, images: gal(i0, i1, i2) },
+  "led-desk-lamp": { image: i1, images: gal(i1, i2, i3) },
+  "ceramic-plant-pot-set": { image: i2, images: gal(i2, i3, i4) },
+  "wooden-coffee-table": { image: i3, images: gal(i3, i4, i5) },
+  "stainless-steel-kettle": { image: i4, images: gal(i4, i5, i6) },
+  "wall-art-canvas": { image: i5, images: gal(i5, i6, i7) },
+  "bamboo-storage-basket": { image: i6, images: gal(i6, i7, i0) },
+  "patio-string-lights": { image: i7, images: gal(i7, i0, i1) },
+};
+
+function isUnusableImageUrl(url: string): boolean {
+  if (!url) return true;
+  return url.includes("placehold.co");
+}
+
+export function resolveProductImages(
+  slug: string,
+  dbImages?: string[] | null
+): { image: string; images: string[] } {
+  const bySlug = PRODUCT_IMAGE_BY_SLUG[slug];
+  if (bySlug) return bySlug;
+
+  const fromDb = dbImages?.filter((u) => u && !isUnusableImageUrl(u)) ?? [];
+  if (fromDb.length > 0) {
+    return { image: fromDb[0], images: fromDb };
+  }
+
+  return { image: P.phoneRed, images: [P.phoneRed] };
+}
 
 function gal(...paths: string[]): string[] {
   const unique: string[] = [];

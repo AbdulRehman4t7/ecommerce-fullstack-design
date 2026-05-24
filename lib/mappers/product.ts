@@ -1,3 +1,4 @@
+import { resolveProductImages } from "@/lib/productImages";
 import type { Product } from "@/types";
 import type { ProductRowWithCategory } from "@/types/database";
 
@@ -20,7 +21,7 @@ function parseSpecs(specs: unknown): { key: string; value: string }[] {
 }
 
 export function mapProductRow(row: ProductRowWithCategory): Product {
-  const images = row.images?.length ? row.images : [""];
+  const { image, images } = resolveProductImages(row.slug, row.images);
   return {
     id: row.id,
     slug: row.slug,
@@ -29,7 +30,7 @@ export function mapProductRow(row: ProductRowWithCategory): Product {
     originalPrice: row.original_price ? Number(row.original_price) : undefined,
     minOrder: row.min_order,
     unit: row.unit,
-    image: images[0],
+    image,
     images,
     description: row.description ?? "",
     category: row.categories?.name ?? "General",
