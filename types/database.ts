@@ -102,17 +102,49 @@ export interface Database {
           },
         ];
       };
+      profiles: {
+        Row: {
+          id: string;
+          full_name: string | null;
+          email: string;
+          avatar_url: string | null;
+          role: "user" | "admin";
+          phone: string | null;
+          address: string | null;
+          city: string | null;
+          country: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          full_name?: string | null;
+          email: string;
+          avatar_url?: string | null;
+          role?: "user" | "admin";
+          phone?: string | null;
+          address?: string | null;
+          city?: string | null;
+          country?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
+        Relationships: [];
+      };
       cart_items: {
         Row: {
           id: string;
           session_id: string;
+          user_id: string | null;
           product_id: string;
           quantity: number;
           created_at: string;
         };
         Insert: {
           id?: string;
-          session_id: string;
+          session_id?: string;
+          user_id?: string | null;
           product_id: string;
           quantity?: number;
           created_at?: string;
@@ -120,6 +152,7 @@ export interface Database {
         Update: {
           id?: string;
           session_id?: string;
+          user_id?: string | null;
           product_id?: string;
           quantity?: number;
           created_at?: string;

@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compress: true,
   images: {
     remotePatterns: [
       {
@@ -8,7 +9,11 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "**.supabase.co",
+        hostname: "*.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
       },
     ],
   },

@@ -320,8 +320,24 @@ export default function ProductDetail({
         </div>
       </section>
 
-      <div className="mt-8">
+      <div className="mt-8 pb-20 md:pb-0">
         <PromoBanner />
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-2 border-t border-border bg-white p-3 md:hidden">
+        <button
+          type="button"
+          onClick={() => addToCart(product, quantity)}
+          className="flex-1 rounded bg-success py-3 text-sm font-semibold text-white"
+        >
+          Add to Cart
+        </button>
+        <Link
+          href="/cart"
+          className="flex-1 rounded bg-primary py-3 text-center text-sm font-semibold text-white"
+        >
+          Buy Now
+        </Link>
       </div>
     </div>
   );

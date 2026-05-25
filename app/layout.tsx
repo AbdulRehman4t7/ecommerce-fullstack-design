@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { CartProvider } from "@/context/CartContext";
+import Providers from "@/components/Providers";
 import "./globals.css";
 
 const inter = Inter({
@@ -9,8 +9,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Ecommerce - Global B2B Marketplace",
-  description: "Alibaba-style B2B ecommerce marketplace",
+  title: "ShopZone — Best Deals Online",
+  description: "Shop millions of products at the best prices",
+  keywords: ["ecommerce", "shopping", "deals", "electronics"],
+  openGraph: {
+    title: "ShopZone",
+    description: "Best eCommerce deals",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -21,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <CartProvider>{children}</CartProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

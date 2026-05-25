@@ -39,3 +39,43 @@ export async function queryCategories(): Promise<Category[]> {
     productCount: counts.get(cat.id) ?? 0,
   }));
 }
+
+export async function createCategory(payload: {
+  name: string;
+  slug: string;
+  icon?: string | null;
+  parent_id?: string | null;
+}) {
+  const { createServiceClient } = await import("@/lib/supabase/server");
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("categories")
+    .insert(payload)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updateCategory(
+  id: string,
+  payload: Partial<{ name: string; slug: string; icon: string | null; parent_id: string | null }>
+) {
+  const { createServiceClient } = await import("@/lib/supabase/server");
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("categories")
+    .update(payload)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function deleteCategory(id: string) {
+  const { createServiceClient } = await import("@/lib/supabase/server");
+  const supabase = createServiceClient();
+  const { error } = await supabase.from("categories").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}

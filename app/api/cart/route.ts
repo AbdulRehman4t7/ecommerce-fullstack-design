@@ -1,50 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServiceClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient, createServiceClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { mapProductRow } from "@/lib/mappers/product";
-import type {
-  Database,
-  ProductRowWithCategory,
-} from "@/types/database";
+import type { ProductRowWithCategory } from "@/types/database";
 
 export const dynamic = "force-dynamic";
-
-type CartItemInsert = Database["public"]["Tables"]["cart_items"]["Insert"];
 
 const SESSION_COOKIE = "cart_session_id";
 
 function getSessionId(request: NextRequest): string {
-  const existing = request.cookies.get(SESSION_COOKIE)?.value;
-  if (existing) return existing;
-  return crypto.randomUUID();
+  return request.cookies.get(SESSION_COOKIE)?.value ?? crypto.randomUUID();
 }
 
-export async function GET(request: NextRequest) {
+type CartRow = {
+  quantity: number;
+  products: ProductRowWithCategory;
+};
+
+export async function GET() {
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ data: [], message: "Cart uses local storage" });
   }
 
   try {
-    const sessionId = request.cookies.get(SESSION_COOKIE)?.value;
-    if (!sessionId) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
       return NextResponse.json({ data: [] });
     }
 
-    const supabase = createServiceClient();
-    const { data, error } = await supabase
+    const service = createServiceClient();
+    const { data, error } = await service
       .from("cart_items")
       .select("quantity, products(*, categories(name, slug))")
-      .eq("session_id", sessionId);
+      .eq("user_id", user.id);
 
     if (error) throw error;
-
-    type CartRow = {
-      quantity: number;
-      products: ProductRowWithCategory;
-    };
 
     const items = ((data ?? []) as CartRow[]).map((row) => ({
       quantity: row.quantity,
       product: mapProductRow(row.products),
+      selected: true,
     }));
 
     return NextResponse.json({ data: items });
@@ -66,28 +64,43 @@ export async function POST(request: NextRequest) {
     };
 
     if (!body.product_id) {
-      return NextResponse.json(
-        { error: "product_id is required" },
-        { status: 400 }
+      return NextResponse.json({ error: "product_id is required" }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const response = NextResponse.json({ message: "Cart updated" });
+
+    if (user) {
+      const service = createServiceClient();
+      const { error } = await service.from("cart_items").upsert(
+        {
+          user_id: user.id,
+          product_id: body.product_id,
+          quantity: body.quantity ?? 1,
+          session_id: user.id,
+        },
+        { onConflict: "user_id,product_id" }
       );
+      if (error) throw error;
+      return response;
     }
 
     const sessionId = getSessionId(request);
-    const supabase = createServiceClient();
-
-    const payload: CartItemInsert = {
-      session_id: sessionId,
-      product_id: body.product_id,
-      quantity: body.quantity ?? 1,
-    };
-
-    const { error } = await supabase
-      .from("cart_items")
-      .upsert([payload], { onConflict: "session_id,product_id" });
-
+    const service = createServiceClient();
+    const { error } = await service.from("cart_items").upsert(
+      {
+        session_id: sessionId,
+        product_id: body.product_id,
+        quantity: body.quantity ?? 1,
+      },
+      { onConflict: "session_id,product_id" }
+    );
     if (error) throw error;
 
-    const response = NextResponse.json({ message: "Cart updated" });
     response.cookies.set(SESSION_COOKIE, sessionId, {
       httpOnly: true,
       sameSite: "lax",
@@ -97,5 +110,29 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error("POST /api/cart:", err);
     return NextResponse.json({ error: "Failed to sync cart" }, { status: 500 });
+  }
+}
+
+export async function DELETE() {
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json({ message: "OK" });
+  }
+
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ message: "OK" });
+    }
+
+    const service = createServiceClient();
+    await service.from("cart_items").delete().eq("user_id", user.id);
+    return NextResponse.json({ message: "Cart cleared" });
+  } catch (err) {
+    console.error("DELETE /api/cart:", err);
+    return NextResponse.json({ error: "Failed to clear cart" }, { status: 500 });
   }
 }

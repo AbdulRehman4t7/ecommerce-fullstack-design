@@ -168,7 +168,7 @@ export default function ProductListingClient({
       <button
         type="button"
         onClick={() => setFilterOpen(true)}
-        className="mb-4 flex items-center gap-2 rounded border border-border bg-white px-4 py-2 text-sm lg:hidden"
+        className="fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full bg-accent px-4 py-3 text-sm font-medium text-white shadow-lg lg:hidden"
       >
         <Filter size={16} />
         Filters
