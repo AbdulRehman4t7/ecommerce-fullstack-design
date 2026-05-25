@@ -32,7 +32,18 @@ export default function LoginForm() {
     const err = await signIn(email, password);
     setSubmitting(false);
     if (err) {
-      setError("Invalid email or password");
+      const msg = err.toLowerCase();
+      if (msg.includes("email not confirmed") || msg.includes("not confirmed")) {
+        setError(
+          "Pehle apni email confirm karein — inbox/spam mein Supabase ka link open karein, phir dubara sign in karein."
+        );
+      } else if (msg.includes("invalid login credentials") || msg.includes("invalid")) {
+        setError(
+          "Email ya password galat hai. Agar abhi signup kiya hai to pehle confirmation email confirm karein."
+        );
+      } else {
+        setError(err);
+      }
       return;
     }
     router.push(redirect);

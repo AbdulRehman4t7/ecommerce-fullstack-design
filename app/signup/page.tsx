@@ -63,7 +63,8 @@ export default function SignupPage() {
       )}
       {success && (
         <div className="mb-4 rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-success">
-          Account created! Check your email to confirm, then sign in.
+          Account ban gaya! Supabase ne confirmation email bheji hai — inbox/spam kholo,
+          link par click karo, phir login karo.
         </div>
       )}
 
