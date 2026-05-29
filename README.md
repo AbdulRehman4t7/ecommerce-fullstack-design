@@ -5,6 +5,39 @@ A full-stack B2B marketplace web app inspired by **Alibaba / AliExpress**: produ
 **Live stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · Supabase (PostgreSQL + Auth) · Vercel-ready deployment
 
 ---
+## 🌐 Live Demo
+
+🚀 Experience the project live here:  
+
+🔗 **[View Live Demo](https://ecommerce-fullstack-design-lac.vercel.app/)**
+
+---
+
+## ✨ Features
+
+- 🛒 Modern Full Stack E-Commerce UI
+- 🔐 User Authentication System
+- 📦 Product Listings & Categories
+- ❤️ Wishlist & Cart Functionality
+- 💳 Responsive Checkout Flow
+- 📱 Fully Responsive Design
+- ⚡ Fast Performance with Modern Stack
+- 🎨 Clean & User-Friendly Interface
+
+---
+
+## 🖼️ Preview
+
+> Click the live demo link above to explore the complete application.
+
+---
+
+## 🚀 Deployment
+
+The project is deployed on **Vercel** for fast and reliable hosting.
+
+🔗 Live URL:  
+https://ecommerce-fullstack-design-lac.vercel.app/
 
 ## Table of contents
 
